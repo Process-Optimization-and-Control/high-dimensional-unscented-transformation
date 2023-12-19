@@ -7,9 +7,8 @@ Created on Mon Sep 18 16:16:16 2023
 import numpy as np
 import scipy.stats
 import scipy.linalg
-# import scipy.integrate
 import matplotlib.pyplot as plt
-# import matplotlib
+import matplotlib
 import pathlib
 import os
 import pandas as pd
@@ -36,10 +35,9 @@ We can re-use existing results by setting load_old_sim=True. If that one is Fals
 """
 
 project_dir = pathlib.Path(__file__).parent.parent
-dir_data = os.path.join(project_dir, "data_y_x2_corr_x") #save
-# dir_data_load = os.path.join(dir_data, "100_iter_kappafunc_hdsut")
-# dir_data_load = os.path.join(dir_data, "50_iter_231130_hdsut")
-dir_data_load = os.path.join(dir_data, "100_iter_kappafixed_20231204")
+dir_data = os.path.join(project_dir, "data_y_x2_corr_x") #directory where new data is saved
+
+dir_data_load = os.path.join(dir_data, "res_paper_100_iter") #only loaded if load_old_sim=True
 
 #%% Def x-dist
 
@@ -51,7 +49,7 @@ dim_x_list = np.array([2, 10, 25, 50, 100, 250, 500, 750, 1000])
 # dim_x_list = np.array([250, 500, 750, 1000])
 dim_x_list = dim_x_list.astype(int)
 print(f"{dim_x_list=}")
-load_old_sim = False #if True, it loads old simulations. False, it reruns simulations.
+load_old_sim = True #if True, it loads old simulations. False, it reruns simulations.
 
 N_mc = int(3e4) #Number of MC samples
 
@@ -249,7 +247,7 @@ if not load_old_sim:
                     #check condition number of matrix square-root
                     df_cond_Px_sqrt.loc[idx_df, label] = np.linalg.cond(Px_sqrt_i)
                     
-                    ym_hdut, Py_hdut, _, A_hdut, _ = ut.hdut_map_func_fast2(xm, Px_sqrt_i, ca_func_map, points_x)
+                    ym_hdut, Py_hdut, _, A_hdut, _ = ut.hdut_map_func(xm, Px_sqrt_i, ca_func_map, points_x)
                     
                     assert np.allclose(A_hdut, 0.)
                     
@@ -275,7 +273,7 @@ if not load_old_sim:
                 for label, sqrt_f in zip(sqrt_method, sqrt_func):
                     label = f" ({label})"
                     Px_sqrt_i = sqrt_f(Px)
-                    ym_hdsut, Py_hdsut = ut.hdut_map_func_fast2(xm, Px_sqrt_i, ca_func_map, points_x)[:2]
+                    ym_hdsut, Py_hdsut = ut.hdut_map_func(xm, Px_sqrt_i, ca_func_map, points_x)[:2]
                     
                     try: #check if covariance matrix is positive definite
                         scipy.linalg.cholesky(Py_hdsut, lower = True)
@@ -450,27 +448,27 @@ Py_cond_mean.to_csv(os.path.join(dir_data, "Py_cond_mean.csv"))
 Py_cond_std.to_csv(os.path.join(dir_data, "Py_cond_std.csv"))
 
 #%% Compute p-values
-
+font = {'size': 16}
+matplotlib.rc('font', **font)
 dim_x_eval = [1000]
-dim_x_eval = [500]
+# dim_x_eval = [500]
 import scipy.stats
 for dim_x in dim_x_eval:
     ut_chol = df_Py_norm.loc[(df_Py_norm["Method"] == "UT (Chol)") & (df_Py_norm["dim_x"] == dim_x), "norm_diff"]
     ut_prin = df_Py_norm.loc[(df_Py_norm["Method"] == "UT (Prin)") & (df_Py_norm["dim_x"] == dim_x), "norm_diff"]
     ut_eig = df_Py_norm.loc[(df_Py_norm["Method"] == "UT (Eig)") & (df_Py_norm["dim_x"] == dim_x), "norm_diff"]
     
-    sut_chol = df_Py_norm.loc[(df_Py_norm["Method"] == "SUT2 (Chol)") & (df_Py_norm["dim_x"] == dim_x), "norm_diff"]
-    sut_prin = df_Py_norm.loc[(df_Py_norm["Method"] == "SUT2 (Prin)") & (df_Py_norm["dim_x"] == dim_x), "norm_diff"]
-    sut_eig = df_Py_norm.loc[(df_Py_norm["Method"] == "SUT2 (Eig)") & (df_Py_norm["dim_x"] == dim_x), "norm_diff"]
+    sut_chol = df_Py_norm.loc[(df_Py_norm["Method"] == "SUT (Chol)") & (df_Py_norm["dim_x"] == dim_x), "norm_diff"]
+    sut_prin = df_Py_norm.loc[(df_Py_norm["Method"] == "SUT (Prin)") & (df_Py_norm["dim_x"] == dim_x), "norm_diff"]
+    sut_eig = df_Py_norm.loc[(df_Py_norm["Method"] == "SUT (Eig)") & (df_Py_norm["dim_x"] == dim_x), "norm_diff"]
     
     t_stat, p_val = scipy.stats.ttest_ind(sut_chol, sut_prin)
     print(f"{dim_x=}, ut_chol vs ut_prin: {p_val=}")
     
-plt.figure()
 fig, ax = plt.subplots(1,1, layout = "constrained")
-ax.hist(sut_chol, alpha = .3, label = "SUT (Chol)")
-ax.hist(sut_prin, alpha = .3, label = "SUT (Prin)")
-ax.set_xlabel("RMSE")
+ax.hist(sut_chol, alpha = .3, label = "SUT (Chol)", bins = 20)
+ax.hist(sut_prin, alpha = .3, label = "SUT (Prin)", bins = 20)
+ax.set_xlabel(r"$||P_y - P_y^{ana}||_F$")
 ax.legend()
     
 

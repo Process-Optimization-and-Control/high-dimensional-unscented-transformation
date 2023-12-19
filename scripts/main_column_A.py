@@ -178,12 +178,12 @@ if n_threads_hx == 1:
 else:
     hx_map_func = hx.map(points_hdut.dim_sigma, "thread", n_threads_hx)
 
-hd_ukf = UKF.HD_UKF_additive_noise(x0.copy(), P0.copy(), fx_map_func, hx_map_func, points_hdut, Q_nom, R_nom, name="HD-UKF")
+hd_ukf = UKF.HD_UKF_additive_noise(x0.copy(), P0.copy(), fx_map_func, hx_map_func, points_hdut, Q_nom, R_nom, name="HD-UKF", P_sqrt_func = spc.sqrt_eig)
 #%% Scaled UKF
 
 points_s = spc.ScaledSigmaPoints(dim_x, kappa = 1e-7, alpha = 1e-3, beta = 2., sqrt_method = spc.sqrt_eig)
 
-s_ukf = UKF.UKF_map_based(x0.copy(), P0.copy(), fx_map_func, hx_map_func, points_hdut, np.diag(Q_nom), np.diag(R_nom), points_s, name="S-UKF")
+s_ukf = UKF.UKF_map_based(x0.copy(), P0.copy(), fx_map_func, hx_map_func, points_s, np.diag(Q_nom), np.diag(R_nom), name="S-UKF")
 
 #%% Def EKF
 ekf = EKF.EKF_additive_noise(x0.copy(), P0.copy(), fx, fx_jac_func, hx, hx_jac_func, Q_nom, R_nom) 

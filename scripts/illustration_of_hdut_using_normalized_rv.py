@@ -164,9 +164,9 @@ for i in range(dim_x_ind):
     
     #Do 1D UTs
     if i == 0:
-        yi_mean, Pyi, Ai = ut.hdut_w_function_eval_wslr100(sigmas_ei_all, sigmas_ei, Wm_ei, Wc_ei, func_n, **kwargs_ut, Pxi_inv = 1/Di)
+        yi_mean, Pyi, Ai = ut.hdut_w_function_eval_wslr_1D(sigmas_ei_all, sigmas_ei, Wm_ei, Wc_ei, func_n, **kwargs_ut, Pxi_inv = 1/Di)
     else:
-        yi_mean, Pyi, Ai = ut.hdut_w_function_eval_wslr100(sigmas_ei_all, sigmas_ei, Wm_ei, Wc_ei, func_hdut_n, first_yi = 0., **kwargs_ut, Pxi_inv = 1/Di)
+        yi_mean, Pyi, Ai = ut.hdut_w_function_eval_wslr_1D(sigmas_ei_all, sigmas_ei, Wm_ei, Wc_ei, func_hdut_n, first_yi = 0., **kwargs_ut, Pxi_inv = 1/Di)
 
     ym_hdut += yi_mean
     Py_hdut += Pyi

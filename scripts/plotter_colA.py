@@ -26,8 +26,7 @@ Plot results of the column A case study. Here, we only plot "statistical" result
 project_dir = pathlib.Path(__file__).parent.parent
 dir_data = os.path.join(project_dir, "data_colA")
 
-res_name = "res - 20231112 - 100iter cvodes dt2"
-res_name = "res - 20231511 - 100iter rk4 dt5"
+
 res_name = "res - 20231218 - 100iter"
 # res_name = "res"
 dir_res = os.path.join(dir_data, res_name)
