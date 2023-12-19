@@ -1,0 +1,16 @@
+,diverged,diverged,diverged,diverged,diverged,diverged,diverged,diverged,diverged
+dim_x,2.0,10.0,25.0,50.0,100.0,250.0,500.0,750.0,1000.0
+Method,,,,,,,,,
+HD-SUT (Chol),0,0,0,0,0,0,0,0,0
+HD-SUT (Eig),0,0,0,1,1,2,8,15,33
+HD-SUT (Prin),0,0,0,0,0,0,0,0,0
+HD-UT (Chol),0,0,0,0,0,0,0,0,0
+HD-UT (Eig),0,0,0,0,1,0,3,2,4
+HD-UT (Prin),0,0,0,0,0,0,0,0,0
+MC,0,0,0,0,0,0,0,0,0
+SUT (Chol),0,0,0,0,0,0,0,0,0
+SUT (Eig),0,0,1,4,21,71,99,100,100
+SUT (Prin),0,0,0,0,0,0,0,0,0
+UT (Chol),0,0,0,0,0,0,0,0,0
+UT (Eig),0,0,1,15,29,51,50,51,56
+UT (Prin),0,0,0,0,0,0,0,0,0
