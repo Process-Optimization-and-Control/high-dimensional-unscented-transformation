@@ -1,3 +1,15 @@
+/data
+/data_colA
+/plots_colA
+/data_y_x2_corr_x
+/data_example_coordinate_transf
+
+*.npy
+*.csv
+*.svg
+*.eps
+*.pdf
+*.pkl
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

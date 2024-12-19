@@ -198,10 +198,10 @@ def hdut_map_func(xm, Px_sqrt, map_func, points_a, func_args = [], calc_Pxy = Tr
     
     #weights are the same for each 1D distribution. Create them here, before the for-loop
     if points_a.type == "ScaledSigmaPoints":
-        points_new = spc.ScaledSigmaPoints(1, alpha = points_a.alpha, beta = points_a.beta, kappa = 3. - 1, kappa_func = points_a.kappa_func, suppress_init_warning = True)
+        points_new = spc.ScaledSigmaPoints(1, alpha = points_a.alpha, beta = points_a.beta, kappa = points_a.kurtosis - 1, kappa_func = points_a.kappa_func, suppress_init_warning = True)
         Wm_ei, Wc_ei = points_new.compute_weights()
     elif points_a.type == "JulierSigmaPoints":
-        points_new = spc.JulierSigmaPoints(1, kappa = 3. - 1)
+        points_new = spc.JulierSigmaPoints(1, kappa = points_a.kurtosis - 1, suppress_kappa_warning = True)
         Wm_ei = points_new.compute_weights()
         Wc_ei = Wm_ei.copy()
         

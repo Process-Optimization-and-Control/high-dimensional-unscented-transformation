@@ -49,7 +49,7 @@ dim_x_list = np.array([2, 10, 25, 50, 100, 250, 500, 750, 1000])
 # dim_x_list = np.array([250, 500, 750, 1000])
 dim_x_list = dim_x_list.astype(int)
 print(f"{dim_x_list=}")
-load_old_sim = True #if True, it loads old simulations. False, it reruns simulations.
+load_old_sim = False #if True, it loads old simulations. False, it reruns simulations.
 
 N_mc = int(3e4) #Number of MC samples
 
