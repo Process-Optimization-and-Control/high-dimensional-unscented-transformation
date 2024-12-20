@@ -86,7 +86,7 @@ class JulierSigmaPoints(SigmaPoints):
 }
     
     """
-    def __init__(self, n, kappa = 0., sqrt_method = scipy.linalg.sqrtm, suppress_kappa_warning = False):
+    def __init__(self, n, kappa = 0., sqrt_method = scipy.linalg.sqrtm, suppress_kappa_warning = False, kurtosis = 3.):
         """
         Init
 
@@ -115,6 +115,7 @@ class JulierSigmaPoints(SigmaPoints):
         self.dim_sigma = self.num_sigma_points()
         self.Wm = self.compute_weights()
         self.Wc = self.Wm.copy()
+        self.kurtosis = kurtosis
         
         self.type = "JulierSigmaPoints" #useful when checking types
         
@@ -193,7 +194,7 @@ class ScaledSigmaPoints(SigmaPoints):
 
     """
     
-    def __init__(self, n, alpha = 1e-3, beta = 2., kappa = 0., sqrt_method = scipy.linalg.sqrtm, suppress_init_warning = False, force_Wm_sum_zero = False, kappa_func = None):
+    def __init__(self, n, alpha = 1e-3, beta = 2., kappa = 0., sqrt_method = scipy.linalg.sqrtm, suppress_init_warning = False, force_Wm_sum_zero = False, kappa_func = None, kurtosis = 3.):
         """
         Init
 
@@ -221,6 +222,7 @@ class ScaledSigmaPoints(SigmaPoints):
         if self.kappa_func is not None:
             kappa = self.kappa_func(n)
         self.kappa = kappa
+        self.kurtosis = kurtosis
         self.force_Wm_sum_zero = force_Wm_sum_zero
         self.lam = self.calculate_lam()
         if ((self.kappa != np.max([(3-n), 0])) and (suppress_init_warning == False)):
