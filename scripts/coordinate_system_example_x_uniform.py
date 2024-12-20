@@ -47,11 +47,11 @@ for d in dirs:
 
 #%% Set-up
 
-load_old_sim = False #if True, it loads old simulations. False, it reruns simulations.
+load_old_sim = True #if True, it loads old simulations. False, it reruns simulations.
 N = 20 #number of times to repeat the simulation
 
 #state dimensions to run
-dim_x_list = np.array([2, 10, 100]).astype(int)
+dim_x_list = np.array([2, 10, 100, 1000]).astype(int)
 print(f"{dim_x_list=}")
 
 N_mc = int(5e5) #Number of MC samples
@@ -117,13 +117,27 @@ if not load_old_sim:
 
             
             #%% Analytical solution, approximated by MC sim 
-
-            x_samples = np.array([scipy.stats.uniform.rvs(loc = -ai, scale = 2*ai, size = N_mc) for ai in a_unif]) + xm.reshape(-1,1)  
+            
+            if False: # random samples (standard MC simulations)
+                x_samples = np.array([scipy.stats.uniform.rvs(loc = -ai, scale = 2*ai, size = N_mc) for ai in a_unif]) + xm.reshape(-1,1)  
+            else: # LHS
+                x_dists = np.array([scipy.stats.uniform(loc = -ai, scale = 2*ai) for ai in a_unif])
+                x_samples = utils.get_lhs_points(x_dists, N_mc)
+                
+                #verify samples are in the region specified by the Uniform distribution
+                check_lb = np.greater_equal(x_samples, -a_unif.reshape(-1,1))
+                check_ub = np.less_equal(x_samples, a_unif.reshape(-1,1))
+                assert (np.all(check_lb) and np.all(check_ub)), f"Somehting wrong with LHS. Have {np.all(check_lb)=} and {np.all(check_ub)=} for the generated samples"
+                
+                x_samples += xm.reshape(-1,1) #correct the mean
+                
+            
             y_mc = np.array(list(map(func, x_samples.T)))
 
             ym_ana = np.mean(y_mc, axis = 0)
             dim_y = ym_ana.shape[0]
             Py_ana = np.cov(y_mc, rowvar = False)
+            
             
             assert Py_ana.shape == ((dim_x, dim_x))
                 
@@ -300,7 +314,6 @@ else:
     df_Py_norm = pd.read_pickle(os.path.join(dir_data_load, "df_Py_norm.pkl"))
     df_ym_norm = pd.read_pickle(os.path.join(dir_data_load, "df_ym_norm.pkl"))
     df_std_norm = pd.read_pickle(os.path.join(dir_data_load, "df_std_norm.pkl"))   
-    df_Py_cond = pd.read_pickle(os.path.join(dir_data_load, "df_Py_cond.pkl"))
     
 
 
@@ -383,13 +396,13 @@ fg = sns.pointplot(df_ym_norm_ss, x = "dim_x", y = "norm_diff", hue = "Method", 
 
 
 
-ax_ym_pp_ym.set_ylabel(r"$||\hat{y}-\hat{y}^{MC}||_{2}$")
+ax_ym_pp_ym.set_ylabel(r"$||\hat{y}-\hat{y}^{LHS}||_{2}$")
 ax_ym_pp_ym.set_xlabel(r"$n_{x}$")
 h, l = ax_ym_pp_ym.get_legend_handles_labels()
-l = ["UT-C" if li == "Cubature (Chol)" else li.split(" (Chol)")[0] for li in l]
+l = ["UT-C" if li == "Cubature" else li.split(" (Chol)")[0] for li in l]
 ax_ym_pp_ym.get_legend().remove()
 fig_ym_pp.legend(handles = h, labels = l, loc = "outside upper center", ncols = 3, frameon = False)
-fname = "ym_norm_x_unif"
+fname = "Figure 3 - ym_norm_x_unif"
 [fig_ym_pp.savefig(os.path.join(dir_plt, f"{fname}.{ext}")) for ext in ["svg", "pdf", "eps"]]
 
 fig_Py_pp, ax_Py_pp_ym = plt.subplots(1, 1, layout = "constrained", sharex = True)#, figsize = [6.4 , 5.05])
@@ -406,10 +419,10 @@ fg = sns.pointplot(df_Py_norm_ss, x = "dim_x", y = "norm_diff", hue = "Method", 
 
 
 
-ax_Py_pp_ym.set_ylabel(r"$||P_{y}-P_{y}^{MC}||_{F}$")
+ax_Py_pp_ym.set_ylabel(r"$||P_{y}-P_{y}^{LHS}||_{F}$")
 ax_Py_pp_ym.set_xlabel(r"$n_{x}$")
 h, l = ax_Py_pp_ym.get_legend_handles_labels()
-l = ["UT-C" if li == "Cubature (Chol)" else li.split(" (Chol)")[0] for li in l]
+l = ["UT-C" if li == "Cubature" else li.split(" (Chol)")[0] for li in l]
 ax_Py_pp_ym.get_legend().remove()
 fig_Py_pp.legend(handles = h, labels = l, loc = "outside upper center", ncols = 3, frameon = False)
 fname = "Py_norm_x_unif"
@@ -429,10 +442,10 @@ fg = sns.pointplot(df_std_norm_ss, x = "dim_x", y = "norm_diff", hue = "Method",
 
 
 
-ax_std_pp_ym.set_ylabel(r"$||\sigma_{y}-\sigma_{y}^{MC}||_{2}$")
+ax_std_pp_ym.set_ylabel(r"$||\sigma_{y}-\sigma_{y}^{LHS}||_{2}$")
 ax_std_pp_ym.set_xlabel(r"$n_{x}$")
 h, l = ax_std_pp_ym.get_legend_handles_labels()
-l = ["UT-C" if li == "Cubature (Chol)" else li.split(" (Chol)")[0] for li in l]
+l = ["UT-C" if li == "Cubature" else li.split(" (Chol)")[0] for li in l]
 ax_std_pp_ym.get_legend().remove()
 fig_std_pp.legend(handles = h, labels = l, loc = "outside upper center", ncols = 3, frameon = False)
 fname = "std_dev_norm_x_unif"
@@ -462,18 +475,18 @@ fg = sns.pointplot(df_Py_norm_ss, x = "dim_x", y = "norm_diff", hue = "Method", 
                  )
 
 
-ax_bp_std.set_ylabel(r"$||\sigma_{y}-\sigma_{y}^{MC}||_{2}$")
-ax_bp_Py.set_ylabel(r"$||P_{y}-P_{y}^{MC}||_{F}$")
+ax_bp_std.set_ylabel(r"$||\sigma_{y}-\sigma_{y}^{LHS}||_{2}$")
+ax_bp_Py.set_ylabel(r"$||P_{y}-P_{y}^{LHS}||_{F}$")
 ax_bp_Py.set_xlabel(r"$n_{x}$")
 ax_bp_std.set_xlabel(r"$n_{x}$")
 h, l = ax_bp_Py.get_legend_handles_labels()
-l = ["UT-C" if li == "Cubature (Chol)" else li.split(" (Chol)")[0] for li in l]
+l = ["UT-C" if li == "Cubature" else li.split(" (Chol)")[0] for li in l]
 
 
 ax_bp_std.get_legend().remove()
 ax_bp_Py.get_legend().remove()
 fig_bp.legend(handles = h, labels = l, loc = "outside upper center", ncols = 3, frameon = False)
-fname = "Py_and_std_dev_norm_together_x_unif"
+fname = "Figure 4 - Py_and_std_dev_norm_together_x_unif"
 [fig_bp.savefig(os.path.join(dir_plt, f"{fname}.{ext}")) for ext in ["svg", "pdf", "eps"]]
 
 
