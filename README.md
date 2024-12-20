@@ -2,6 +2,7 @@
  
  Code for the paper "A Numerically Stable Unscented Transformation with Optimal Tuning Parameters for High-Dimensional Systems"
 
+
  The files to run to reproduce the results are:
  - scripts
  - coordinate_system_example_x_uniform.py: To run simulations of the coordinate transformation example, Section 7 in the paper.
@@ -13,5 +14,5 @@ Other files which may be interesting to run:
 - main_sigma_point_plot_sqrt.py: Shows the effect on the sigma-points in 2D when using different matrix square-roots.
 - illustration_of_hdut_using_normalized_rv.py: Implementing HD-UT as in Section 4.2 (not the optimal way of implementing it (not Algorithm 1), but shows the reasoning of the approach).
 
-The code works using Python 3.11.5, CasADi 3.6.3, numpy 1.25.2, scipy 1.11.3, pandas 2.1.1, matplotlib 3.7.2, seaborn 0.13.0
+Some package versions used in the author's environment 3.11.5, CasADi 3.6.3, numpy 1.25.2, scipy 1.11.3, pandas 2.1.1, matplotlib 3.7.2, seaborn 0.13.0
 
